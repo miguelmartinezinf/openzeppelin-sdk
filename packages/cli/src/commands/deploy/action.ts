@@ -1,9 +1,12 @@
-import { getConstructorInputs } from '@openzeppelin/upgrades';
+import fs from 'fs-extra';
+import path from 'path';
+
+import { getConstructorInputs, getBuildArtifacts } from '@openzeppelin/upgrades';
+import { transpileContracts } from '@openzeppelin/contracts-transpiler';
 
 import Session from '../../models/network/Session';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
-import ConfigManager from '../../models/config/ConfigManager';
 import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
@@ -68,9 +71,22 @@ async function runCreate(params: Options & Args): Promise<void> {
 
   if (params.kind === 'minimal') {
     params['minimal'] = true;
+
+    // because we already compiled
+    params.skipCompile = true;
+
+    await createAction(params.contract, params);
   }
 
-  params.skipCompile = true;
+  // transpile contracts
+  if (params.kind === 'upgradeable') {
+    const { contract: contractName, arguments: deployArgs } = params;
 
-  await createAction(params.contract, params);
+    const files = transpileContracts([contractName], getBuildArtifacts().listArtifacts());
+    for (const file of files) {
+      await fs.ensureDir(path.dirname(file.path));
+      fs.writeFileSync(file.path, file.source);
+    }
+    await createAction(`${params.contract}Upgradable`, params);
+  }
 }
