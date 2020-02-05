@@ -27,7 +27,7 @@ describe('publish script', function() {
     projectFile.publish = false;
     this.networkFile = new NetworkFile(projectFile, network);
 
-    await push({
+    await push([], {
       network,
       txParams,
       networkFile: this.networkFile,

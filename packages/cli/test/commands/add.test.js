@@ -9,7 +9,7 @@ describe('add command', function() {
   itShouldParse(
     'should call add script with an alias and a filename',
     'add',
-    'zos add ImplV1:Impl --skip-compile',
+    'oz add ImplV1:Impl --skip-compile',
     function(add) {
       add.should.have.been.calledWithExactly({
         contractsData: [{ name: 'ImplV1', alias: 'Impl' }],
@@ -20,7 +20,7 @@ describe('add command', function() {
   itShouldParse(
     'should call add-all script when passing --all option',
     'addAll',
-    'zos add --all --skip-compile',
+    'oz add --all --skip-compile',
     function(addAll) {
       addAll.should.have.been.calledWithExactly({});
     },
@@ -29,9 +29,9 @@ describe('add command', function() {
   itShouldParse(
     'should call push script when passing --push option',
     'push',
-    'zos add --all --push test --skip-compile',
+    'oz add --all --push test --skip-compile',
     function(push) {
-      push.should.have.been.calledWithExactly({
+      push.should.have.been.calledWithExactly([], {
         deployProxyAdmin: undefined,
         deployProxyFactory: undefined,
         deployDependencies: true,

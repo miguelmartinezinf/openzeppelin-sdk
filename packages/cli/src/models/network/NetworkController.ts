@@ -121,7 +121,7 @@ export default class NetworkController {
   }
 
   public async deployChangedSolidityLibs(contractNames: string): Promise<void> {
-    const libNames = this._getAllSolidityLibNames([contractNames]);
+    const libNames = this.getAllSolidityLibNames([contractNames]);
     const changedLibraries = this.getLibsToDeploy(libNames, true);
     await this.uploadSolidityLibs(changedLibraries);
   }
@@ -222,7 +222,7 @@ export default class NetworkController {
   private solidityLibsForPush(onlyChanged = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
 
-    const libNames = this._getAllSolidityLibNames(contractNames);
+    const libNames = this.getAllSolidityLibNames(contractNames);
 
     const clashes = intersection(libNames, contractAliases);
     if (!isEmpty(clashes)) {
@@ -305,7 +305,7 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _unsetSolidityLibs(): Promise<void> {
     const { contractNames } = this.projectFile;
-    const libNames = this._getAllSolidityLibNames(contractNames);
+    const libNames = this.getAllSolidityLibNames(contractNames);
     await allPromisesOrError(
       this.networkFile.solidityLibsMissing(libNames).map(libName => this._unsetSolidityLib(libName)),
     );
@@ -339,24 +339,24 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _getAllSolidityLibNames(contractNames: string[]): string[] {
+  private getAllSolidityLibNames(contractNames: string[]): string[] {
     const graph: string[][] = [];
     const nodes: string[] = [];
 
     contractNames.forEach(contractName => {
-      this._populateDependencyGraph(contractName, nodes, graph);
+      this.populateDependencyGraph(contractName, nodes, graph);
     });
 
     // exclude original contracts
     return [...difference(toposort(graph), contractNames).reverse()];
   }
 
-  private _populateDependencyGraph(contractName: string, nodes: string[], graph: string[][]) {
+  private populateDependencyGraph(contractName: string, nodes: string[], graph: string[][]) {
     // if library is already added just ingore it
     if (!nodes.includes(contractName)) {
       nodes.push(contractName);
       this._getContractDependencies(contractName).forEach(dependencyContractName => {
-        this._populateDependencyGraph(dependencyContractName, nodes, graph);
+        this.populateDependencyGraph(dependencyContractName, nodes, graph);
         graph.push([contractName, dependencyContractName]);
       });
     }

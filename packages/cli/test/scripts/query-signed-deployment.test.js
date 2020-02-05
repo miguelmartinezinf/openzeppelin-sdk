@@ -26,7 +26,7 @@ describe('query-signed-deployment script', function() {
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       this.salt = random(0, 2 ** 32);
-      await push({ network, networkFile: this.networkFile });
+      await push([], { network, networkFile: this.networkFile });
     });
 
     it('should query deployment address from signature', async function() {

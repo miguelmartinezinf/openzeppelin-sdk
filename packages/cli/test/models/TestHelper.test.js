@@ -10,7 +10,6 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1');
 
 describe('TestHelper', function() {
   const [owner] = accounts;

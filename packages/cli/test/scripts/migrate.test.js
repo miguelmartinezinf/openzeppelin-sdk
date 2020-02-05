@@ -73,7 +73,7 @@ describe('migrate-manifest-version script', function() {
 
   context('for unpublished project', function() {
     beforeEach('initialize proxies manually', async function() {
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');
       this.implV1Proxy = await Proxy.deploy(this.implV1.address, owner, EMPTY_INITIALIZATION_DATA, txParams);
@@ -144,7 +144,7 @@ describe('migrate-manifest-version script', function() {
 
   context('for published project', function() {
     beforeEach('simulates a manifest version 2 project', async function() {
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');
       this.directory = await ImplementationDirectory.new({ from: owner });

@@ -20,7 +20,7 @@ describe('NetworkController', function() {
     sinon.restore();
   });
 
-  describe('_getAllSolidityLibNames()', () => {
+  describe('getAllSolidityLibNames()', () => {
     let controllerMock;
     beforeEach(() => {
       projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
@@ -100,7 +100,7 @@ describe('NetworkController', function() {
         .withArgs('G')
         .returns(['E']);
 
-      const result = controller._getAllSolidityLibNames(['0']);
+      const result = controller.getAllSolidityLibNames(['0']);
 
       assert.deepEqual(result, ['Z', 'Y', 'D', 'E', 'G', 'F', 'C', 'B', 'A']);
     });
@@ -135,12 +135,12 @@ describe('NetworkController', function() {
         .returns(['A']);
 
       expect(() => {
-        controller._getAllSolidityLibNames(['0']);
+        controller.getAllSolidityLibNames(['0']);
       }).to.throw(/Cyclic/);
     });
   });
 
-  describe('_solidityLibsForPush()', () => {
+  describe('scolidityLibsForPush()', () => {
     describe('with one public library', () => {
       beforeEach(() => {
         projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
@@ -149,7 +149,7 @@ describe('NetworkController', function() {
       });
 
       it('should retrieve the library', () => {
-        const libs = controller._solidityLibsForPush();
+        const libs = controller.solidityLibsForPush();
         libs.length.should.eq(1);
       });
     });
@@ -162,7 +162,7 @@ describe('NetworkController', function() {
       });
 
       it('should retrieve the library', () => {
-        const libs = controller._solidityLibsForPush();
+        const libs = controller.solidityLibsForPush();
 
         libs.length.should.eq(2);
       });
@@ -185,7 +185,7 @@ describe('NetworkController', function() {
     });
 
     it('set dependencies', () => {
-      const libs = controller._solidityLibsForPush();
+      const libs = controller.solidityLibsForPush();
 
       networkFileMock.expects('addSolidityLib').withArgs('GreeterLibLib', '42');
       networkFileMock.expects('addSolidityLib').withArgs('GreeterLibWithLib', '42');

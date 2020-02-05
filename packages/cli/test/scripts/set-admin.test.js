@@ -34,7 +34,7 @@ describe('set-admin script', function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
 
       this.impl1 = await createProxy({
         contractAlias: 'Impl',
@@ -131,7 +131,7 @@ describe('set-admin script', function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
-      await push({
+      await push([], {
         network,
         txParams,
         deployDependencies: true,

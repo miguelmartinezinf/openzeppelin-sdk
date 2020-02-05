@@ -57,7 +57,7 @@ describe('verify script', function() {
       });
 
       it('throws error if contract source code has changed locally since last deploy', async function() {
-        await push({ network, networkFile: this.networkFile, txParams });
+        await push([], { network, networkFile: this.networkFile, txParams });
         const contracts = this.networkFile.contracts;
         contracts[contractAlias].localBytecodeHash = '0x0303456';
         this.networkFile.contracts = contracts;
@@ -77,7 +77,7 @@ describe('verify script', function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
-      await push({ network, networkFile: this.networkFile, txParams });
+      await push([], { network, networkFile: this.networkFile, txParams });
       this.logs = new CaptureLogs();
       this.axiosStub = sinon.stub(axios, 'request');
     });

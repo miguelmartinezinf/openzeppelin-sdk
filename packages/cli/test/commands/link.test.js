@@ -24,7 +24,7 @@ describe('link command', function() {
     'push',
     'openzeppelin link mock-stdlib@1.1.0 mock-stdlib-2@1.2.0 --push test',
     function(push) {
-      push.should.have.been.calledWithExactly({
+      push.should.have.been.calledWithExactly([], {
         deployProxyAdmin: undefined,
         deployProxyFactory: undefined,
         deployDependencies: true,

@@ -112,12 +112,12 @@ describe('push script', function() {
     });
 
     it('should not redeploy contracts if unmodified', async function() {
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
     });
 
     it('should redeploy unmodified contract if forced', async function() {
-      await push({
+      await push([], {
         networkFile: this.networkFile,
         network,
         txParams,
@@ -128,18 +128,18 @@ describe('push script', function() {
 
     it('should redeploy contracts if modified', async function() {
       modifyBytecode.call(this, 'Impl');
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
     });
 
     it('should redeploy contracts if library is modified', async function() {
       modifyLibraryBytecode.call(this, 'UintLib');
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('WithLibraryImpl').address.should.not.eq(this.withLibraryPreviousAddress);
     });
 
     it('should not redeploy contracts if library is unmodified', async function() {
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
     });
 
@@ -150,7 +150,7 @@ describe('push script', function() {
       });
 
       it('should refuse to redeploy a contract if storage is incompatible', async function() {
-        await push({
+        await push([], {
           networkFile: this.networkFile,
           network,
           txParams,
@@ -159,7 +159,7 @@ describe('push script', function() {
       });
 
       it('should redeploy contract ignoring warnings', async function() {
-        await push({
+        await push([], {
           force: true,
           networkFile: this.networkFile,
           network,
@@ -170,7 +170,7 @@ describe('push script', function() {
 
       it('should refuse to redeploy a contract if validation throws', async function() {
         sinon.stub(zosLib, 'validate').throws(new Error('Stubbed error during contract validation'));
-        await push({
+        await push([], {
           networkFile: this.networkFile,
           network,
           txParams,
@@ -180,7 +180,7 @@ describe('push script', function() {
 
       it('should redeploy contract skipping errors', async function() {
         sinon.stub(zosLib, 'validate').throws(new Error('Stubbed error during contract validation'));
-        await push({
+        await push([], {
           force: true,
           networkFile: this.networkFile,
           network,
@@ -210,7 +210,7 @@ describe('push script', function() {
           contractsData: [{ name: 'WithConstructor' }],
           projectFile: this.networkFile.projectFile,
         });
-        await push({
+        await push([], {
           networkFile: this.networkFile,
           network,
           txParams,
@@ -225,7 +225,7 @@ describe('push script', function() {
           contractsData: [{ name: 'WithConstructor' }],
           projectFile: this.networkFile.projectFile,
         });
-        await push({
+        await push([], {
           networkFile: this.networkFile,
           network,
           txParams,
@@ -244,7 +244,7 @@ describe('push script', function() {
           contractsData: [{ name: 'WithConstructor' }],
           projectFile: this.networkFile.projectFile,
         });
-        await push({
+        await push([], {
           networkFile: this.networkFile,
           network,
           txParams,
@@ -254,7 +254,7 @@ describe('push script', function() {
 
         this.logs.clear();
         modifyBytecode.call(this, 'WithConstructor');
-        await push({ networkFile: this.networkFile, network, txParams });
+        await push([], { networkFile: this.networkFile, network, txParams });
 
         this.logs.errors.should.have.lengthOf(0);
         const contract = this.networkFile.contract('WithConstructor');
@@ -266,7 +266,7 @@ describe('push script', function() {
           contractsData: [{ name: 'WithConstructor' }],
           projectFile: this.networkFile.projectFile,
         });
-        await push({
+        await push([], {
           networkFile: this.networkFile,
           network,
           txParams,
@@ -276,7 +276,7 @@ describe('push script', function() {
 
         this.logs.clear();
         modifyBytecode.call(this, 'Impl');
-        await push({ networkFile: this.networkFile, network, txParams });
+        await push([], { networkFile: this.networkFile, network, txParams });
 
         this.logs.errors.should.have.lengthOf(0);
         this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
@@ -292,7 +292,7 @@ describe('push script', function() {
         projectFile: this.networkFile.projectFile,
       });
 
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
 
       this.networkFile.packageAddress.should.eq(previousPackage);
     });
@@ -302,7 +302,7 @@ describe('push script', function() {
         version: '1.2.0',
         projectFile: this.networkFile.projectFile,
       });
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
 
       const _package = Package.fetch(this.networkFile.package.address);
       (await _package.getDirectory('1.2.0')).address.should.eq(this.networkFile.providerAddress);
@@ -313,7 +313,7 @@ describe('push script', function() {
         version: '1.2.0',
         projectFile: this.networkFile.projectFile,
       });
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
       const implementationAddress = this.networkFile.contract('Impl').address;
       const _package = Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
@@ -324,7 +324,7 @@ describe('push script', function() {
         version: '1.1.0',
         projectFile: this.newNetworkFile.projectFile,
       });
-      await push({ network, txParams, networkFile: this.newNetworkFile });
+      await push([], { network, txParams, networkFile: this.newNetworkFile });
       await freeze({ network, txParams, networkFile: this.newNetworkFile });
       this.newNetworkFile.frozen.should.be.true;
 
@@ -336,7 +336,7 @@ describe('push script', function() {
         contractsData: [{ name: 'ImplV1', alias: 'Impl' }],
         projectFile: this.newNetworkFile.projectFile,
       });
-      await push({ network, txParams, networkFile: this.newNetworkFile });
+      await push([], { network, txParams, networkFile: this.newNetworkFile });
       this.newNetworkFile.frozen.should.be.false;
     });
   };
@@ -347,7 +347,7 @@ describe('push script', function() {
         contracts: ['Impl'],
         projectFile: this.networkFile.projectFile,
       });
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
 
       if (unregisterFromDirectory) {
         const _package = Package.fetch(this.networkFile.package.address);
@@ -397,7 +397,7 @@ describe('push script', function() {
       });
 
       beforeEach('running new push', async function() {
-        await push({ networkFile: this.networkFile, network, txParams });
+        await push([], { networkFile: this.networkFile, network, txParams });
       });
 
       it('should update dependency to new version in network file', async function() {
@@ -420,7 +420,7 @@ describe('push script', function() {
     it('should refuse to push when frozen upon modified contracts', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile });
       modifyBytecode.call(this, 'Impl');
-      await push({
+      await push([], {
         network,
         txParams,
         networkFile: this.networkFile,
@@ -430,7 +430,7 @@ describe('push script', function() {
     it('should refuse to push when frozen upon modified libraries', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile });
       modifyLibraryBytecode.call(this, 'UintLib');
-      await push({
+      await push([], {
         network,
         txParams,
         networkFile: this.networkFile,
@@ -458,7 +458,7 @@ describe('push script', function() {
   const shouldPushHelperContracts = function() {
     describe('on pushing helper contracts', function() {
       beforeEach('pushing', async function() {
-        await push({
+        await push([], {
           deployProxyAdmin: true,
           deployProxyFactory: true,
           network,
@@ -484,7 +484,7 @@ describe('push script', function() {
       it('should not redeploy helper contracts if present', async function() {
         const proxyAdminAddress = this.networkFile.proxyAdminAddress;
         const proxyFactoryAddress = this.networkFile.proxyFactoryAddress;
-        await push({
+        await push([], {
           deployProxyAdmin: true,
           deployProxyFactory: true,
           network,
@@ -505,7 +505,7 @@ describe('push script', function() {
 
     describe('on push', function() {
       beforeEach('pushing', async function() {
-        await push({ network, txParams, networkFile: this.networkFile });
+        await push([], { network, txParams, networkFile: this.networkFile });
       });
 
       shouldDeployApp();
@@ -523,7 +523,7 @@ describe('push script', function() {
 
     describe('on push', function() {
       beforeEach('pushing', async function() {
-        await push({ network, txParams, networkFile: this.networkFile });
+        await push([], { network, txParams, networkFile: this.networkFile });
         const newProjectFile = new ProjectFile('test/mocks/packages/package-with-contracts-v2.zos.json');
         this.newNetworkFile = new NetworkFile(newProjectFile, network);
       });
@@ -540,7 +540,7 @@ describe('push script', function() {
 
       it('should notify if there was nothing to do since last push', async function() {
         const logs = new CaptureLogs();
-        await push({ network, txParams, networkFile: this.networkFile });
+        await push([], { network, txParams, networkFile: this.networkFile });
         logs.text.should.match(/all contracts are up to date/i);
         logs.restore();
       });
@@ -554,7 +554,7 @@ describe('push script', function() {
       const projectFile = new ProjectFile('test/mocks/packages/package-with-invalid-contracts.zos.json');
       this.networkFile = new NetworkFile(projectFile, network);
 
-      await push({
+      await push([], {
         networkFile: this.networkFile,
         network,
         txParams,
@@ -574,7 +574,7 @@ describe('push script', function() {
         const projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
 
-        await push({ networkFile: this.networkFile, network, txParams });
+        await push([], { networkFile: this.networkFile, network, txParams });
       });
 
       shouldDeployApp();
@@ -587,7 +587,7 @@ describe('push script', function() {
         const projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib-range.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
 
-        await push({ networkFile: this.networkFile, network, txParams });
+        await push([], { networkFile: this.networkFile, network, txParams });
       });
 
       shouldDeployApp();
@@ -604,7 +604,7 @@ describe('push script', function() {
       });
 
       it('should fail to push', async function() {
-        await push({
+        await push([], {
           network,
           txParams,
           networkFile: this.networkFile,
@@ -619,7 +619,7 @@ describe('push script', function() {
       });
 
       it('should fail to push', async function() {
-        await push({
+        await push([], {
           network,
           txParams,
           networkFile: this.networkFile,
@@ -634,7 +634,7 @@ describe('push script', function() {
       });
 
       it('should fail to push', async function() {
-        await push({
+        await push([], {
           network,
           txParams,
           networkFile: this.networkFile,
@@ -644,7 +644,7 @@ describe('push script', function() {
       });
 
       it('should create custom deployment', async function() {
-        await push({
+        await push([], {
           network,
           txParams,
           networkFile: this.networkFile,
@@ -666,7 +666,7 @@ describe('push script', function() {
 
     it('should run push', async function() {
       const logs = new CaptureLogs();
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
       logs.text.should.match(/all contracts are up to date/i);
       logs.restore();
     });
@@ -683,7 +683,7 @@ describe('push script', function() {
 
     describe('on push', function() {
       beforeEach('pushing', async function() {
-        await push({ network, txParams, networkFile: this.networkFile });
+        await push([], { network, txParams, networkFile: this.networkFile });
       });
 
       shouldDeployContracts();
@@ -697,7 +697,7 @@ describe('push script', function() {
           version: '1.2.0',
           projectFile: this.networkFile.projectFile,
         });
-        await push({ networkFile: this.networkFile, network, txParams });
+        await push([], { networkFile: this.networkFile, network, txParams });
         this.networkFile.version.should.eq('1.2.0');
         this.networkFile.contract('Impl').address.should.eq(previousAddress);
       });
@@ -714,7 +714,7 @@ describe('push script', function() {
       projectFile.publish = false;
       this.networkFile = new NetworkFile(projectFile, network);
 
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
     });
 
     shouldSetDependency();
@@ -733,7 +733,7 @@ describe('push script', function() {
 
     it('fails nicely if there are duplicated contract names', async function() {
       const logs = new CaptureLogs();
-      await push({
+      await push([], {
         network,
         txParams,
         networkFile: this.networkFile,
@@ -744,11 +744,6 @@ describe('push script', function() {
     });
   });
 });
-
-async function getImplementationFromApp(contractAlias) {
-  const app = await App.fetch(this.networkFile.appAddress);
-  return await app.getImplementation(this.networkFile.projectFile.name, contractAlias);
-}
 
 function modifyBytecode(contractAlias) {
   const contractData = this.networkFile.contract(contractAlias);

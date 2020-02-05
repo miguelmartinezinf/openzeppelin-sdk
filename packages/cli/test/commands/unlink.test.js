@@ -9,7 +9,7 @@ describe('unlink command', function() {
   itShouldParse(
     'calls unlink script with a dependency name as parameter',
     'unlink',
-    'zos unlink mock-stdlib@1.1.0 mock-stdlib-2@1.1.0',
+    'oz unlink mock-stdlib@1.1.0 mock-stdlib-2@1.1.0',
     function(unlink) {
       const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib-2@1.1.0'];
       unlink.should.have.been.calledWithExactly({ dependencies });
@@ -19,9 +19,9 @@ describe('unlink command', function() {
   itShouldParse(
     'should call push script when passing --push option',
     'push',
-    'zos unlink mock-stdlib@1.1.0 --push test',
+    'oz unlink mock-stdlib@1.1.0 --push test',
     function(push) {
-      push.should.have.been.calledWithExactly({
+      push.should.have.been.calledWithExactly([], {
         deployProxyAdmin: undefined,
         deployProxyFactory: undefined,
         deployDependencies: true,

@@ -110,7 +110,7 @@ describe('create script', function() {
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await add({ contractsData, projectFile: this.projectFile });
-      await push({ network, txParams, networkFile: this.networkFile });
+      await push([], { network, txParams, networkFile: this.networkFile });
     });
 
     it('should create a proxy for one of its contracts', async function() {
@@ -567,7 +567,7 @@ describe('create script', function() {
           dependencies: ['mock-stdlib-undeployed@1.1.0'],
           projectFile: this.projectFile,
         });
-        await push({
+        await push([], {
           network,
           txParams,
           deployDependencies: true,

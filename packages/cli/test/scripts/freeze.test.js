@@ -24,7 +24,7 @@ describe('freeze script', function() {
       this.projectFile.publish = false;
       this.networkFile = new NetworkFile(this.projectFile, network);
 
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
     });
 
     it('should reject to freeze', async function() {
@@ -40,7 +40,7 @@ describe('freeze script', function() {
     beforeEach('push lib', async function() {
       this.networkFile = new NetworkFile(this.projectFile, network);
 
-      await push({ networkFile: this.networkFile, network, txParams });
+      await push([], { networkFile: this.networkFile, network, txParams });
     });
 
     it('should be marked as frozen', async function() {

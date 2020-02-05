@@ -27,7 +27,7 @@ describe('send-tx script', function() {
 
     const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
     await add({ contractsData, projectFile: this.projectFile });
-    await push({ network, txParams, networkFile: this.networkFile });
+    await push([], { network, txParams, networkFile: this.networkFile });
     await createProxy({
       contractAlias: 'Impl',
       network,

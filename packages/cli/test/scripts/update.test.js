@@ -76,7 +76,7 @@ describe('update script', function() {
       { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' },
     ];
     await add({ contractsData, projectFile: this.projectFile });
-    await push({ network, txParams, networkFile: this.networkFile });
+    await push([], { network, txParams, networkFile: this.networkFile });
 
     this.implV1Address = this.networkFile.contract('Impl').address;
     this.withLibraryImplV1Address = this.networkFile.contract('WithLibraryImpl').address;
@@ -111,7 +111,7 @@ describe('update script', function() {
       contractsData: newContractsData,
       projectFile: this.projectFile,
     });
-    await push({ network, txParams, networkFile: this.networkFile });
+    await push([], { network, txParams, networkFile: this.networkFile });
 
     this.implV2Address = this.networkFile.contract('Impl').address;
     this.withLibraryImplV2Address = this.networkFile.contract('WithLibraryImpl').address;
@@ -323,7 +323,7 @@ describe('update script', function() {
           contractsData: [{ name: 'UnmigratableImplV2', alias: 'WithLibraryImpl' }],
           projectFile: this.projectFile,
         });
-        await push({ network, txParams, networkFile: this.networkFile });
+        await push([], { network, txParams, networkFile: this.networkFile });
 
         await update({
           contractAlias: undefined,
@@ -423,7 +423,7 @@ describe('update script', function() {
             contractsData: [{ name: 'WithLibraryImplV1', alias: 'NoMigrate' }],
             projectFile: this.projectFile,
           });
-          await push({ network, txParams, networkFile: this.networkFile });
+          await push([], { network, txParams, networkFile: this.networkFile });
 
           await update({
             contractAlias: 'NoMigrate',
@@ -486,7 +486,7 @@ describe('update script', function() {
       beforeEach('setup', async function() {
         this.networkFile = new NetworkFile(this.projectFile, network);
 
-        await push({
+        await push([], {
           network,
           txParams,
           deployDependencies: true,
@@ -517,7 +517,7 @@ describe('update script', function() {
           dependencies: ['mock-stdlib-undeployed-2@1.2.0'],
           projectFile: this.projectFile,
         });
-        await push({
+        await push([], {
           network,
           txParams,
           deployDependencies: true,
