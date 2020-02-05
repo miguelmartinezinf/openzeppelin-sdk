@@ -33,7 +33,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
 
   if (!options.skipTelemetry) await Telemetry.report('push', linkArguments, interactive);
   await link(linkArguments);
-  await push.runActionIfRequested(options);
+  await push.runActionIfRequested([], options);
 }
 
 async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {

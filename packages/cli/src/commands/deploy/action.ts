@@ -1,5 +1,15 @@
 import fs from 'fs-extra';
 import path from 'path';
+import { pickBy } from 'lodash';
+
+import { Loggy } from '@openzeppelin/upgrades';
+import { ProxyType, CreateParams } from '../../scripts/interfaces';
+import { Contract } from '@openzeppelin/upgrades';
+import { validateSalt } from '../../utils/input';
+
+import link from '../link';
+import add from '../add';
+import push from '../push';
 
 import { getConstructorInputs, getBuildArtifacts } from '@openzeppelin/upgrades';
 import { transpileContracts } from '@openzeppelin/contracts-transpiler';
@@ -10,7 +20,6 @@ import { fromContractFullName } from '../../utils/naming';
 import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
-import { createAction } from '../create';
 
 import { Options, Args } from './spec';
 
@@ -87,6 +96,74 @@ async function runCreate(params: Options & Args): Promise<void> {
       await fs.ensureDir(path.dirname(file.path));
       fs.writeFileSync(file.path, file.source);
     }
-    await createAction(`${params.contract}Upgradable`, params);
+    await createAction(params.contract, params);
+  }
+}
+
+async function createAction(contractFullName: string, options: any): Promise<void> {
+  if (options.minimal) {
+    Loggy.noSpin.warn(__filename, 'action', 'create-minimal-proxy', 'Minimal proxy support is still experimental.');
+  }
+  const { skipCompile } = options;
+  if (!skipCompile) await compile();
+
+  const network = options.network;
+
+  await add.runActionIfNeeded(contractFullName, options);
+  await push.runActionIfNeeded([contractFullName], network, {
+    ...options,
+    network,
+  });
+
+  const { force } = options;
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+
+  const args = pickBy({
+    packageName,
+    contractAlias,
+    force,
+  } as CreateParams);
+
+  if (options.minimal) args.kind = ProxyType.Minimal;
+
+  await createProxy({ ...args, network });
+  Session.setDefaultNetworkIfNeeded(network);
+}
+
+async function createProxy({
+  packageName,
+  contractAlias,
+  methodName,
+  methodArgs,
+  network,
+  txParams = {},
+  force = false,
+  salt = null,
+  signature = null,
+  admin = null,
+  kind = ProxyType.Upgradeable,
+  networkFile,
+}: Partial<CreateParams>): Promise<Contract | never> {
+  if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.');
+  validateSalt(salt, false);
+
+  const controller = new NetworkController(network, txParams, networkFile);
+  try {
+    await controller.checkContractDeployed(packageName, contractAlias, !force);
+    const proxy = await controller.createProxy(
+      packageName,
+      contractAlias,
+      methodName,
+      methodArgs,
+      admin,
+      salt,
+      signature,
+      kind,
+    );
+    stdout(proxy.address);
+
+    return proxy;
+  } finally {
+    controller.writeNetworkPackageIfNeeded();
   }
 }

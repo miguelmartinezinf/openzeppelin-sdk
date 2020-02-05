@@ -26,7 +26,7 @@ async function action(contracts: string[], options: any): Promise<void> {
 
   await Telemetry.report('remove', prompted, interactive);
   remove(prompted);
-  await push.runActionIfRequested(options);
+  await push.runActionIfRequested([], options);
 }
 
 function getCommandProps(): InquirerQuestions {

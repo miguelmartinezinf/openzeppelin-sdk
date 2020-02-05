@@ -41,7 +41,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
     if (!options.skipTelemetry) await Telemetry.report('add', { contractsData }, interactive);
     add({ contractsData });
   }
-  await push.runActionIfRequested(options);
+  await push.runActionIfRequested(contractNames, options);
 }
 
 async function runActionIfNeeded(contractName?: string, options?: any): Promise<void> {

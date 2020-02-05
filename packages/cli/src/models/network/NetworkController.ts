@@ -47,6 +47,11 @@ import { ProxyType } from '../../scripts/interfaces';
 type Project = ProxyAdminProject | AppProject;
 type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
+interface PushOptions {
+  reupload: boolean;
+  force: boolean;
+}
+
 export default class NetworkController {
   public localController: LocalController;
   public txParams: TxParams;
@@ -122,13 +127,16 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(reupload = false, force = false): Promise<void | never> {
-    const changedLibraries = this._solidityLibsForPush(!reupload);
-    const contracts = this._contractsListForPush(!reupload, changedLibraries);
+  public async push(
+    contracts: string[],
+    { reupload = false, force = false }: Partial<PushOptions> = {},
+  ): Promise<void | never> {
+    const changedLibraries = this.solidityLibsForPush(!reupload);
+    const contractObjects = this.contractsForPush(contracts, !reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
-    if (!this.validateContracts(contracts, buildArtifacts) && !force) {
+    if (!this.validateContracts(contractObjects, buildArtifacts) && !force) {
       throw Error(
         'One or more contracts have validation errors. Please review the items listed above and fix them, or run this command again with the --force option.',
       );
@@ -140,11 +148,11 @@ export default class NetworkController {
 
     this.checkNotFrozen();
     await this.uploadSolidityLibs(changedLibraries);
-    await Promise.all([this.uploadContracts(contracts), this.unsetContracts()]);
+    await Promise.all([this.uploadContracts(contractObjects), this.unsetContracts()]);
 
     await this._unsetSolidityLibs();
 
-    if (isEmpty(contracts) && isEmpty(changedLibraries)) {
+    if (isEmpty(contractObjects) && isEmpty(changedLibraries)) {
       Loggy.noSpin(__filename, 'push', `after-push`, `All contracts are up to date`);
     } else {
       Loggy.noSpin(__filename, 'push', `after-push`, `All contracts have been deployed`);
@@ -167,29 +175,34 @@ export default class NetworkController {
 
   // DeployerController
   private _checkVersion(): void {
-    if (this._newVersionRequired()) {
+    if (this.newVersionRequired()) {
       this.networkFile.frozen = false;
       this.networkFile.contracts = {};
     }
   }
 
   // DeployerController
-  private _newVersionRequired(): boolean {
+  private newVersionRequired(): boolean {
     return this.projectVersion !== this.currentVersion && this.isPublished;
   }
 
   // Contract model
-  private _contractsListForPush(onlyChanged = false, changedLibraries: Contract[] = []): [string, Contract][] {
-    const newVersion = this._newVersionRequired();
+  private contractsForPush(
+    contracts: string[],
+    onlyChanged = false,
+    changedLibraries: Contract[] = [],
+  ): [string, Contract][] {
+    const newVersion = this.newVersionRequired();
 
-    return toPairs(this.projectFile.contracts)
+    return contracts
+      .map(alias => [alias, this.projectFile.contracts[alias]])
       .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
       .filter(
         ([contractAlias, contract]) =>
           newVersion ||
           !onlyChanged ||
           this.hasContractChanged(contractAlias, contract) ||
-          this._hasChangedLibraries(contract, changedLibraries),
+          this.hasChangedLibraries(contract, changedLibraries),
       );
   }
 
@@ -204,7 +217,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _solidityLibsForPush(onlyChanged = false): Contract[] | never {
+  private solidityLibsForPush(onlyChanged = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
 
     const libNames = this._getAllSolidityLibNames(contractNames);
@@ -313,7 +326,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasChangedLibraries(contract: Contract, changedLibraries: Contract[]): boolean {
+  private hasChangedLibraries(contract: Contract, changedLibraries: Contract[]): boolean {
     const libNames = getSolidityLibNames(contract.schema.bytecode);
     return !isEmpty(
       intersection(

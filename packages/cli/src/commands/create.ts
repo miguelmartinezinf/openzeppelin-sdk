@@ -10,16 +10,10 @@ import { compile } from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
-import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
+import { promptIfNeeded, networksList, contractsList, InquirerQuestions } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType, CreateParams } from '../scripts/interfaces';
 import Telemetry from '../telemetry';
-
-interface PropsParams {
-  contractFullName?: string;
-  methodName?: string;
-  methodArgs?: string[];
-}
 
 const name = 'create';
 const signature = `${name} [alias]`;

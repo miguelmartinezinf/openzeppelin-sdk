@@ -17,7 +17,7 @@ const register: (program: any) => any = program =>
 async function action(version: string, options: any): Promise<void> {
   await Telemetry.report('bump', { version }, options.interactive);
   await bump({ version });
-  await push.runActionIfRequested(options);
+  await push.runActionIfRequested([], options);
 }
 
 export default { name, signature, description, register, action };
