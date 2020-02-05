@@ -48,7 +48,7 @@ async function commandActions(proxyReference: string, options: any): Promise<voi
     network: promptedNetwork,
   });
 
-  await push.runActionIfNeeded(null, network, {
+  await push.runActionIfNeeded([], network, {
     ...options,
     network: promptedNetwork,
   });

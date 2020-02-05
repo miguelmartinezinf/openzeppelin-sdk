@@ -2,7 +2,7 @@ import NetworkController from '../models/network/NetworkController';
 import { PushParams } from './interfaces';
 
 export default async function push(
-  contracts: string[],
+  aliases: string[],
   {
     network,
     deployDependencies,
@@ -20,7 +20,7 @@ export default async function push(
     if (deployDependencies) await controller.deployDependencies();
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
-    await controller.push(contracts, { reupload, force });
+    await controller.push(aliases, { reupload, force });
     const { appAddress } = controller;
   } finally {
     controller.writeNetworkPackageIfNeeded();

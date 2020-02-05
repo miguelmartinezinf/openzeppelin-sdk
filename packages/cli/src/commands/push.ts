@@ -40,7 +40,7 @@ async function commandActions(options: any): Promise<void> {
   await action([], options);
 }
 
-async function action(contracts: string[], options: any): Promise<void> {
+async function action(aliases: string[], options: any): Promise<void> {
   const {
     force,
     deployDependencies,
@@ -77,21 +77,21 @@ async function action(contracts: string[], options: any): Promise<void> {
   };
 
   if (!options.skipTelemetry) await Telemetry.report('push', pushArguments, interactive);
-  await push(contracts, pushArguments);
+  await push(aliases, pushArguments);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function runActionIfRequested(contracts: string[], externalOptions: any): Promise<void> {
+async function runActionIfRequested(aliases: string[], externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
   const options = omit(externalOptions, 'push');
   const network = isString(externalOptions.push) ? externalOptions.push : undefined;
   if (network) options.network = network;
-  return action(contracts, options);
+  return action(aliases, options);
 }
 
-async function runActionIfNeeded(contracts: string[], network: string, options: any): Promise<void> {
+async function runActionIfNeeded(aliases: string[], network: string, options: any): Promise<void> {
   if (!options.interactive) return;
-  await action(contracts, { ...options, dontExitProcess: true, skipTelemetry: true });
+  await action(aliases, { ...options, dontExitProcess: true, skipTelemetry: true });
 }
 
 async function promptForDeployDependencies(

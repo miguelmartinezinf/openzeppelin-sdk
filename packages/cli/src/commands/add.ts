@@ -22,7 +22,7 @@ const register: (program: any) => any = program =>
     .withNonInteractiveOption()
     .action(action);
 
-async function action(contractNames: string[], options: any): Promise<void> {
+async function action(contractNamesAndAliases: string[], options: any): Promise<void> {
   const { skipCompile, all, interactive } = options;
   ConfigManager.initStaticConfiguration();
 
@@ -30,23 +30,23 @@ async function action(contractNames: string[], options: any): Promise<void> {
 
   if (all) addAll({});
   else {
-    const args = { contractNames };
+    const args = { contractNames: contractNamesAndAliases };
     const props = getCommandProps();
     const prompted = await promptIfNeeded({ args, props }, interactive);
     const contractsData =
-      contractNames.length !== 0
-        ? contractNames.map(splitContractName)
+      contractNamesAndAliases.length !== 0
+        ? contractNamesAndAliases.map(splitContractName)
         : prompted.contractNames.map(contractName => ({ name: contractName }));
 
     if (!options.skipTelemetry) await Telemetry.report('add', { contractsData }, interactive);
     add({ contractsData });
   }
-  await push.runActionIfRequested(contractNames, options);
+  await push.runActionIfRequested(contractNamesAndAliases, options);
 }
 
-async function runActionIfNeeded(contractName?: string, options?: any): Promise<void> {
+async function runActionIfNeeded(fullContractNameWithAlias?: string, options?: any): Promise<void> {
   const { interactive } = options;
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(fullContractNameWithAlias);
   const projectFile = new ProjectFile();
   options = { ...options, skipTelemetry: true };
 

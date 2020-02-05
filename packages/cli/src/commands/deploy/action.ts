@@ -109,7 +109,7 @@ async function createAction(contractFullName: string, options: any): Promise<voi
 
   const network = options.network;
 
-  await add.runActionIfNeeded(contractFullName, options);
+  await add.runActionIfNeeded(`${contractFullName}Upgradable:${contractFullName}`, options);
   await push.runActionIfNeeded([contractFullName], network, {
     ...options,
     network,
@@ -126,7 +126,7 @@ async function createAction(contractFullName: string, options: any): Promise<voi
 
   if (options.minimal) args.kind = ProxyType.Minimal;
 
-  await createProxy({ ...args, network });
+  await createProxy({ ...args, network: options.config.network, txParams: options.config.txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }
 

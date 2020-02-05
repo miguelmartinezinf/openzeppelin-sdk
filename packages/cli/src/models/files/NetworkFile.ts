@@ -25,7 +25,7 @@ export interface ContractInterface {
   types?: any;
   storage?: any;
   warnings?: any;
-  [id: string]: any;
+  [alias: string]: any;
 }
 
 interface SolidityLibInterface {
@@ -349,7 +349,7 @@ export default class NetworkFile {
   }
 
   public hasContract(alias: string): boolean {
-    return !isEmpty(this.contract(alias));
+    return !!this.contract(alias);
   }
 
   public hasContracts(): boolean {
@@ -382,7 +382,7 @@ export default class NetworkFile {
     return this.dependencyHasCustomDeploy(name) && this.dependencySatisfiesVersionRequirement(name);
   }
 
-  public hasSameBytecode(alias: string, klass: any): boolean {
+  public hasSameBytecode(alias: string, klass: Contract): boolean {
     const contract = this.contract(alias) || this.solidityLib(alias);
     if (contract) {
       const localBytecode = contract.localBytecodeHash;

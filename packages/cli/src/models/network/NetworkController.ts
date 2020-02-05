@@ -128,11 +128,11 @@ export default class NetworkController {
 
   // DeployerController
   public async push(
-    contracts: string[],
+    aliases: string[],
     { reupload = false, force = false }: Partial<PushOptions> = {},
   ): Promise<void | never> {
     const changedLibraries = this.solidityLibsForPush(!reupload);
-    const contractObjects = this.contractsForPush(contracts, !reupload, changedLibraries);
+    const contractObjects = this.contractsForPush(aliases, !reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
@@ -188,13 +188,15 @@ export default class NetworkController {
 
   // Contract model
   private contractsForPush(
-    contracts: string[],
+    aliases: string[],
     onlyChanged = false,
     changedLibraries: Contract[] = [],
   ): [string, Contract][] {
     const newVersion = this.newVersionRequired();
 
-    return contracts
+    aliases = !!aliases.length ? aliases : Object.keys(this.projectFile.contracts);
+
+    return aliases
       .map(alias => [alias, this.projectFile.contracts[alias]])
       .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
       .filter(
@@ -211,7 +213,7 @@ export default class NetworkController {
       .map(libName => Contracts.getFromLocal(libName))
       .filter(libClass => {
         const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
-        const hasChanged = this._hasSolidityLibChanged(libClass);
+        const hasChanged = this.hasSolidityLibChanged(libClass);
         return !hasSolidityLib || !onlyChanged || hasChanged;
       });
   }
@@ -420,13 +422,13 @@ export default class NetworkController {
   public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
     const err = this._errorForContractDeployed(packageName, contractAlias);
-    if (err) this._handleErrorMessage(err, throwIfFail);
+    if (err) this.handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
   public checkLocalContractsDeployed(throwIfFail = false): void {
     const err = this._errorForLocalContractsDeployed();
-    if (err) this._handleErrorMessage(err, throwIfFail);
+    if (err) this.handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
@@ -446,14 +448,14 @@ export default class NetworkController {
   // Contract model
   public checkLocalContractDeployed(contractAlias: string, throwIfFail = false): void {
     // if (!packageName) packageName = this.projectFile.name
-    const err = this._errorForLocalContractDeployed(contractAlias);
-    if (err) this._handleErrorMessage(err, throwIfFail);
+    const err = this.errorForLocalContractDeployed(contractAlias);
+    if (err) this.handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  private _errorForLocalContractDeployed(contractAlias: string): string {
+  private errorForLocalContractDeployed(contractAlias: string): string {
     if (!this.isContractDefined(contractAlias)) {
-      return `Contract ${contractAlias} not found in this project`;
+      return `sContract ${contractAlias} not found in this project`;
     } else if (!this.isContractDeployed(contractAlias)) {
       return `Contract ${contractAlias} is not deployed to ${this.network}.`;
     } else if (this.hasContractChanged(contractAlias)) {
@@ -462,7 +464,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private _handleErrorMessage(msg: string, throwIfFail = false): void | never {
+  private handleErrorMessage(msg: string, throwIfFail = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
@@ -471,7 +473,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasSolidityLibChanged(libClass: Contract): boolean {
+  private hasSolidityLibChanged(libClass: Contract): boolean {
     return !this.networkFile.hasSameBytecode(libClass.schema.contractName, libClass);
   }
 
@@ -1104,7 +1106,7 @@ export default class NetworkController {
   // Contract model
   private _errorForContractDeployed(packageName: string, contractAlias: string): string {
     if (packageName === this.projectFile.name) {
-      return this._errorForLocalContractDeployed(contractAlias);
+      return this.errorForLocalContractDeployed(contractAlias);
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {
