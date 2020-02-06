@@ -14,6 +14,7 @@ import push from '../push';
 import { getConstructorInputs, getBuildArtifacts } from '@openzeppelin/upgrades';
 import { transpileContracts } from '@openzeppelin/contracts-transpiler';
 
+import ConfigManager from '../../models/config/ConfigManager';
 import Session from '../../models/network/Session';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
@@ -107,12 +108,15 @@ async function createAction(contractFullName: string, options: any): Promise<voi
   const { skipCompile } = options;
   if (!skipCompile) await compile();
 
-  const network = options.network;
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
+    ...options,
+    network: options.network,
+  });
 
   await add.runActionIfNeeded(`${contractFullName}Upgradable:${contractFullName}`, options);
   await push.runActionIfNeeded([contractFullName], network, {
     ...options,
-    network,
+    network: options.network,
   });
 
   const { force } = options;
@@ -126,7 +130,7 @@ async function createAction(contractFullName: string, options: any): Promise<voi
 
   if (options.minimal) args.kind = ProxyType.Minimal;
 
-  await createProxy({ ...args, ...options });
+  await createProxy({ ...args, network, txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }
 
