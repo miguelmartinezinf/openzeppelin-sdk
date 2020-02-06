@@ -1,7 +1,13 @@
 import { pickBy } from 'lodash';
+import fs from 'fs-extra';
+import path from 'path';
+
+import { transpileContracts } from '@openzeppelin/contracts-transpiler';
+import { getBuildArtifacts } from '@openzeppelin/upgrades';
 
 import push from './push';
 import update from '../scripts/update';
+import ProjectFile from '../models/files/ProjectFile';
 import { parseContractReference } from '../utils/contract';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
@@ -47,6 +53,14 @@ async function commandActions(proxyReference: string, options: any): Promise<voi
     ...options,
     network: promptedNetwork,
   });
+
+  const projectFile = new ProjectFile();
+
+  const files = transpileContracts(projectFile.contractAliases, getBuildArtifacts().listArtifacts());
+  for (const file of files) {
+    await fs.ensureDir(path.dirname(file.path));
+    fs.writeFileSync(file.path, file.source);
+  }
 
   await push.runActionIfNeeded([], network, {
     ...options,
