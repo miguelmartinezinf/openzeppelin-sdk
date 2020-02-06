@@ -1,5 +1,3 @@
-import fs from 'fs-extra';
-import path from 'path';
 import { pickBy } from 'lodash';
 
 import { Loggy } from '@openzeppelin/upgrades';
@@ -11,8 +9,8 @@ import link from '../link';
 import add from '../add';
 import push from '../push';
 
-import { getConstructorInputs, getBuildArtifacts } from '@openzeppelin/upgrades';
-import { transpileContracts } from '@openzeppelin/contracts-transpiler';
+import { getConstructorInputs } from '@openzeppelin/upgrades';
+import { transpileAndSaveContracts } from '../../transpiler';
 
 import ConfigManager from '../../models/config/ConfigManager';
 import Session from '../../models/network/Session';
@@ -92,11 +90,7 @@ async function runCreate(params: Options & Args): Promise<void> {
   if (params.kind === 'upgradeable') {
     const { contract: contractName, arguments: deployArgs } = params;
 
-    const files = transpileContracts([contractName], getBuildArtifacts().listArtifacts());
-    for (const file of files) {
-      await fs.ensureDir(path.dirname(file.path));
-      fs.writeFileSync(file.path, file.source);
-    }
+    await transpileAndSaveContracts([contractName]);
     await createAction(params.contract, params);
   }
 }
