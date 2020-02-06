@@ -126,7 +126,7 @@ async function createAction(contractFullName: string, options: any): Promise<voi
 
   if (options.minimal) args.kind = ProxyType.Minimal;
 
-  await createProxy({ ...args, network: options.config.network, txParams: options.config.txParams });
+  await createProxy({ ...args, ...options });
   Session.setDefaultNetworkIfNeeded(network);
 }
 
