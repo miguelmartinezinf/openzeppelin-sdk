@@ -56,11 +56,11 @@
   },
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
-    "@openzeppelin/contracts-transpiler": "file:../transpiler",
     "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.0",
     "@openzeppelin/resolver-engine-core": "^0.3.3",
     "@openzeppelin/resolver-engine-imports-fs": "^0.3.3",
     "@openzeppelin/test-environment": "^0.1.0",
+    "@openzeppelin/upgradeability-transpiler": "^0.1.0",
     "@openzeppelin/upgrades": "2.7.0-rc.0",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
