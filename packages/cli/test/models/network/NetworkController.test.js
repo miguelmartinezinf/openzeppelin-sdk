@@ -51,52 +51,52 @@ describe('NetworkController', function() {
        */
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('0')
         .returns(['A', 'B', 'C']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('A')
         .returns(['D', 'E', 'F']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('B')
         .returns(['C', 'E', 'F', 'G']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('C')
         .returns(['D', 'G']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('Y')
         .returns(['Z']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('Z')
         .returns([]);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('D')
         .returns([]);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('E')
         .returns(['D', 'Y']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('F')
         .returns(['G']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('G')
         .returns(['E']);
 
@@ -115,22 +115,22 @@ describe('NetworkController', function() {
        */
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('0')
         .returns(['A']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('A')
         .returns(['B']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('B')
         .returns(['C']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('C')
         .returns(['A']);
 
